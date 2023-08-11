@@ -4,10 +4,18 @@ import { AppController } from './app.controller';
 import { UserController } from './users/users.controller';
 import { User } from './users/users.model';
 import { UserService } from './users/users.service';
-import { LocalStrategy } from './local.strategy';
+import { LocalStrategy } from './auth/local.strategy';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '60m' },
+    }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: 'localhost',
@@ -19,6 +27,7 @@ import { LocalStrategy } from './local.strategy';
       synchronize: true,
     }),
     SequelizeModule.forFeature([User]),
+    AuthModule,
   ],
   controllers: [AppController, UserController],
   providers: [UserService, LocalStrategy],

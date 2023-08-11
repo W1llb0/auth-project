@@ -6,19 +6,21 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly localStrategy: LocalStrategy,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('register')
   async register(@Body() user: User): Promise<User> {
-    return this.userService.create(user);
+    return ;
   }
 
   @Post('login')
   @UseGuards(AuthGuard('local'))
   async login(@Body() user: User): Promise<User> {
     return user;
+  }
+
+  @Post('test')
+  test(@Body() user: User): Promise<User> {
+    return this.userService.findOneByEmail(user.email)
   }
 }
