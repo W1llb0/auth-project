@@ -23,9 +23,12 @@ export class AppController {
   }
 
   @UseGuards(LocalAuthGuard)
-  @Post('signup')
+  @Post('auth')
   async login(@Request() req) {
-    const { user, access_token } = await this.authService.login(req.user);
+    const { user, access_token } = await this.authService.login(
+      req.body.email,
+      req.body.password,
+    );
     this.logger.log(`Успешная авторизация для пользователя: ${user.email}`);
     return { user, access_token };
   }
