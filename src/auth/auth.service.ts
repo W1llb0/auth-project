@@ -3,6 +3,7 @@ import { UserService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
+import { User } from 'src/users/users.model';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,10 @@ export class AuthService {
     return null;
   }
 
-  async login(email: string, password: string): Promise<{ user: any, access_token: string }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ user: any; access_token: string }> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
@@ -34,11 +38,20 @@ export class AuthService {
     const payload = { email: user.email, sub: user.id };
 
     return {
-        user: {
-          id: user.id,
-          email: user.email,
-        },
-        access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+      access_token: this.jwtService.sign(payload),
     };
-}
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await User.findAll();
+  }
+
+  async verifyToken(token: string): Promise<any> {
+    const decoded = this.jwtService.verify(token);
+    return decoded;
+  }
 }

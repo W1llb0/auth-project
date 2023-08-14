@@ -6,6 +6,8 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UserService } from './users/users.service';
 import { User } from './users/users.model';
 import { plainToClass } from 'class-transformer';
+import { AuthGuard } from '@nestjs/passport';
+import { RequestWithToken } from './auth/request.interface';
 
 @Controller()
 export class AppController {
@@ -32,4 +34,14 @@ export class AppController {
     this.logger.log(`Успешная авторизация для пользователя: ${user.email}`);
     return { user, access_token };
   }
+
+  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @Get('allUsers')
+  async getAllUsers(@Request() req: RequestWithToken): Promise<any> {
+    const users = await this.authService.getAllUsers();
+    return { users, newToken: req.newToken };
+  }
+
+
 }
