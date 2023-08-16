@@ -24,7 +24,7 @@ export class AuthService {
   async login(
     email: string,
     password: string,
-  ): Promise<{ user: any; access_token: string }> {
+  ): Promise<{ user: any; access_token: string; refresh_token: string }> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
@@ -35,7 +35,7 @@ export class AuthService {
       throw new UnauthorizedException('Неверный логин или пароль');
     }
 
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, };
 
     return {
       user: {
@@ -43,6 +43,7 @@ export class AuthService {
         email: user.email,
       },
       access_token: this.jwtService.sign(payload),
+      refresh_token: this.jwtService.sign(payload),
     };
   }
 
@@ -53,5 +54,9 @@ export class AuthService {
   async verifyToken(token: string): Promise<any> {
     const decoded = this.jwtService.verify(token);
     return decoded;
+  }
+
+  async refreshToken(token: string): Promise<any>{
+
   }
 }

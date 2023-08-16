@@ -34,6 +34,7 @@ export class JwtRefreshMiddleware implements NestMiddleware {
           };
           res.cookie('jwt', newToken, cookieOptions);
           req.newToken = newToken;
+          console.log(newToken)
         }
       } catch (err) {
         // Обработка ошибок при проверке токена.

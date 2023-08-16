@@ -9,7 +9,7 @@ import { plainToClass } from 'class-transformer';
 import { AuthGuard } from '@nestjs/passport';
 import { RequestWithToken } from './auth/request.interface';
 
-@Controller()
+@Controller('api')
 export class AppController {
   private readonly logger = new Logger(AppController.name);
 
@@ -42,6 +42,13 @@ export class AppController {
     const users = await this.authService.getAllUsers();
     return { users, newToken: req.newToken };
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('refresh')
+  // async refreshToken(@Request() req): Promise<any>{
+  //   const user = await this.authService.
+  // }
+
 
 
 }
