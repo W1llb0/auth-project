@@ -18,15 +18,16 @@ import { RefreshTokenStrategy } from './auth/refresh-token.strategy';
 import { AccessTokenStrategy } from './auth/access-token.strategy';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { JwtRefreshMiddleware } from './auth/jwt-refresh.middleware';
 import * as cookieParser from 'cookie-parser';
+import { JwtCookieMiddleware } from './auth/jwt-cookie.middleware';
+import { JwtCheckMiddleware } from './auth/jwt-check.middleware';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '20s' },
+      signOptions: { expiresIn: '15m' },
     }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
@@ -48,11 +49,13 @@ import * as cookieParser from 'cookie-parser';
     JwtStrategy,
     AuthService,
     JwtAuthGuard,
-    JwtRefreshMiddleware,
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtRefreshMiddleware).exclude('auth').forRoutes('*');
+    consumer.apply(cookieParser()).forRoutes('*');
+    consumer.apply(JwtCookieMiddleware).forRoutes('api/auth');
+    consumer.apply(JwtCheckMiddleware).forRoutes('api/allUsers');
+    // consumer.apply(JwtRefreshMiddleware).exclude('api/auth').forRoutes('*');
   }
 }

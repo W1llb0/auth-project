@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/users/users.model';
+import jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,7 @@ export class AuthService {
   async login(
     email: string,
     password: string,
-  ): Promise<{ user: any; access_token: string; refresh_token: string }> {
+  ): Promise<{ user: any; access_token: string }> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
@@ -35,15 +36,15 @@ export class AuthService {
       throw new UnauthorizedException('Неверный логин или пароль');
     }
 
-    const payload = { email: user.email, sub: user.id, };
+    const payload = { email: user.email, sub: user.id };
+    const options: JwtSignOptions = { expiresIn: '15m', secret: process.env.JWT_SECRET };
 
     return {
       user: {
         id: user.id,
         email: user.email,
       },
-      access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, options),
     };
   }
 
@@ -56,7 +57,24 @@ export class AuthService {
     return decoded;
   }
 
-  async refreshToken(token: string): Promise<any>{
+  async refreshToken(decodedToken) {
+    // Получить данные пользователя из токена
+    const userEmail = decodedToken.email;
+    const user = await this.usersService.findOneByEmail(userEmail);
 
+    // Сгенерировать новый токен
+    const payload = { email: user.email, sub: user.id };
+    const options: JwtSignOptions = { expiresIn: '15m', secret: process.env.JWT_SECRET };
+    const token = this.jwtService.sign(payload, options);
+    // // Обновить токен в базе данных
+    // await this.usersService.updateToken(user.id, token);
+    return token;
+  }
+
+  async generateJwtToken(email: string, id: string): Promise<{ user: any; access_token: string }> {
+    const user = await this.usersService.findOneByEmail(email);
+    const payload = { email: user.email, sub: user.id };
+    const options: JwtSignOptions = { expiresIn: '15m', secret: process.env.JWT_SECRET };
+    return { user, access_token: this.jwtService.sign(payload, options) };
   }
 }
