@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        Int      @id @default(autoincrement())
+  email     String   @db.VarChar(255) @unique
+  password  String   @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6) @default(now())
+  updatedAt DateTime @db.Timestamptz(6) @updatedAt
+}
+
+model Cryptocurrency {
+  id                   Int 
+  rank                 Int
+  name                 String
+  symbol               String 
+  slug                 String
+  is_active            Int
+  first_historical_data DateTime
+  last_historical_data DateTime
+  platform             Json         @db.Json
+}

@@ -5,8 +5,6 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AccessTokenStrategy } from './access-token.strategy';
-import { RefreshTokenStrategy } from './refresh-token.strategy';
 
 @Module({
   imports: [

@@ -3,7 +3,7 @@ import { UserService } from '../users/users.service';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/users/users.model';
+import { Users } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
     if (user && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user.toJSON();
+      const { password, ...result } = user;
       return result;
     }
     return null;
@@ -48,8 +48,8 @@ export class AuthService {
     };
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return await User.findAll();
+  async getAllUsers(): Promise<Users[]> {
+    return await this.usersService.findAll();
   }
 
   async verifyToken(token: string): Promise<any> {
