@@ -16,13 +16,13 @@ model Users {
 }
 
 model Cryptocurrency {
-  id                   Int 
-  rank                 Int
-  name                 String
-  symbol               String 
-  slug                 String
-  is_active            Int
-  first_historical_data DateTime
-  last_historical_data DateTime
-  platform             Json         @db.Json
+id Int  @id
+rank Int
+name String
+symbol String
+slug String
+is_active Int
+first_historical_data DateTime
+last_historical_data DateTime
+platform Json @db.Json
 }
