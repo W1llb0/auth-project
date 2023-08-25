@@ -26,3 +26,23 @@ first_historical_data DateTime
 last_historical_data DateTime
 platform Json @db.Json
 }
+
+model LatestListing {
+  id Int                    @id
+  name String
+  symbol String
+  slug String
+  cmc_rank Int
+  num_market_pairs Int
+  circulating_supply Float
+  total_supply Float
+  max_supply Float?
+  infinite_supply Boolean
+  last_updated DateTime
+  date_added DateTime
+  tags String[]
+  platform Json? @db.Json
+  self_reported_circulating_supply Float?
+  self_reported_market_cap Float?
+  quote Json @db.Json
+}

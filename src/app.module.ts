@@ -19,8 +19,10 @@ import { JwtCheckMiddleware } from './auth/jwt-check.middleware';
 import { PrismaModule } from 'prisma/prisma.module';
 import { PrismaService } from 'prisma/prisma.service';
 import { HttpModule } from '@nestjs/axios';
-import { CryptoController } from './crypto/crypto.controller';
-import { CryptoService } from './crypto/crypto.service';
+import { CryptoController } from './crypto/map/crypto.controller';
+import { CryptoService } from './crypto/map/crypto.service';
+import { ListingsLatestController } from './crypto/listings-latest/listings-latest.controller';
+import { ListingsLatestService } from './crypto/listings-latest/listings-latest.service';
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import { CryptoService } from './crypto/crypto.service';
     }),
     AuthModule,
   ],
-  controllers: [AppController, CryptoController],
+  controllers: [AppController, CryptoController, ListingsLatestController],
   providers: [
     UserService,
     LocalStrategy,
@@ -42,6 +44,7 @@ import { CryptoService } from './crypto/crypto.service';
     JwtAuthGuard,
     PrismaService,
     CryptoService,
+    ListingsLatestService,
   ],
 })
 export class AppModule implements NestModule {
