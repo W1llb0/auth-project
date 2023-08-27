@@ -42,13 +42,7 @@ export class CryptoService {
     await this.prisma.cryptocurrency.deleteMany();
 
     await this.prisma.cryptocurrency.createMany({
-      data: cryptocurrencies.map((crypto) => ({
-        ...crypto,
-        first_historical_data: dayjs(crypto.date_added).toDate(),
-        last_historical_data: dayjs(crypto.date_added).toDate(),
-        platform: crypto.platform,
-      })),
-      skipDuplicates: true,
+      data: response.data,
     });
 
     const addedCryptocurrencies = await this.prisma.cryptocurrency.findMany({});
