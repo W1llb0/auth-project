@@ -49,37 +49,12 @@ export class ListingsLatestService {
 
     await this.prisma.latestListing.deleteMany();
 
-    const uniqueData = allData.map((listing) => ({
-      id: listing.id,
-      name: listing.name,
-      symbol: listing.symbol,
-      slug: listing.slug,
-      cmc_rank: listing.cmc_rank,
-      num_market_pairs: listing.num_market_pairs,
-      circulating_supply: listing.circulating_supply,
-      total_supply: listing.total_supply,
-      max_supply: listing.max_supply,
-      infinite_supply: listing.infinite_supply,
-      last_updated: new Date(listing.last_updated),
-      date_added: new Date(listing.date_added),
-      tags: listing.tags,
-      platform: listing.platform,
-      self_reported_circulating_supply:
-        listing.self_reported_circulating_supply,
-      self_reported_market_cap: listing.self_reported_market_cap,
-      quote: listing.quote,
-    }));
-
     await this.prisma.latestListing.createMany({
-      data: uniqueData,
+      data: allData,
     });
 
     const createdListings = await this.prisma.latestListing.findMany();
     return createdListings;
-  }
-
-  async deleteAll(): Promise<void> {
-    await this.prisma.latestListing.deleteMany();
   }
 
   async getListingsWithPagination(

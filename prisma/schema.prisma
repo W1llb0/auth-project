@@ -9,40 +9,42 @@ datasource db {
 
 model Users {
   id        Int      @id @default(autoincrement())
-  email     String   @db.VarChar(255) @unique
+  email     String   @unique @db.VarChar(255)
   password  String   @db.VarChar(255)
-  createdAt DateTime @db.Timestamptz(6) @default(now())
-  updatedAt DateTime @db.Timestamptz(6) @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 }
 
 model Cryptocurrency {
-id Int  @id
-rank Int
-name String
-symbol String
-slug String
-is_active Int
-first_historical_data DateTime
-last_historical_data DateTime
-platform Json @db.Json
+  id                    Int      @id
+  rank                  Int
+  name                  String
+  symbol                String
+  slug                  String
+  is_active             Int
+  first_historical_data DateTime
+  last_historical_data  DateTime
+  platform              Json     @db.Json
 }
 
 model LatestListing {
-  id Int                    @id
-  name String
-  symbol String
-  slug String
-  cmc_rank Int
-  num_market_pairs Int
-  circulating_supply Float
-  total_supply Float
-  max_supply Float?
-  infinite_supply Boolean
-  last_updated DateTime
-  date_added DateTime
-  tags String[]
-  platform Json? @db.Json
+  id                               Int      @id
+  name                             String
+  symbol                           String
+  slug                             String
+  cmc_rank                         Int
+  num_market_pairs                 Int
+  circulating_supply               Float
+  total_supply                     Float
+  market_cap_by_total_supply       Int?
+  max_supply                       Float?
+  infinite_supply                  Boolean
+  last_updated                     DateTime
+  date_added                       DateTime
+  tags                             String[]
   self_reported_circulating_supply Float?
-  self_reported_market_cap Float?
-  quote Json @db.Json
+  self_reported_market_cap         Float?
+  tvl_ratio                        Int?
+  platform                         Json?    @db.Json
+  quote                            Json     @db.Json
 }

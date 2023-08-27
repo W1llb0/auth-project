@@ -12,10 +12,6 @@ export class ListingsLatestController {
     return await this.listingsLatestService.fetchLatestListings();
   }
 
-  @Post('listings/latest/delete')
-  async deleteAll(): Promise<void> {
-    return await this.listingsLatestService.deleteAll();
-  }
 
   @Get('listings/latest')
   async getListings(

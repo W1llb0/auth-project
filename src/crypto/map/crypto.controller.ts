@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Delete } from '@nestjs/common';
 import { CryptoService } from './crypto.service';
 import { CreateCryptocurrencyDto } from 'src/dto/create-cryptocurrency.dto';
 import { Cryptocurrency } from '@prisma/client';
@@ -8,14 +8,12 @@ export class CryptoController {
   constructor(private readonly cryptoService: CryptoService) {}
 
   @Post('crypto')
-  async create(
-    @Body() createCryptocurrencyDto: CreateCryptocurrencyDto,
-  ): Promise<Cryptocurrency[]> {
+  async create(): Promise<Cryptocurrency[]> {
     return this.cryptoService.create();
   }
 
-  @Post('delete')
-  async deleteAll(): Promise<void> {
-    return await this.cryptoService.deleteAll();
+  @Delete('crypto')
+  async delete(){
+    return this.cryptoService.deleteAll();
   }
 }
