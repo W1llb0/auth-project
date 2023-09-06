@@ -1,26 +1,26 @@
-import { Controller } from '@nestjs/common';
-import { Post, Get, Query } from '@nestjs/common';
-import { ListingsLatestService } from './listings-latest.service';
-import { LatestListing } from '@prisma/client';
+// import { Controller } from '@nestjs/common';
+// import { Post, Get, Query } from '@nestjs/common';
+// import { ListingsLatestService } from './listings-latest.service';
+// import { LatestListing } from '@prisma/client';
 
-@Controller('api')
-export class ListingsLatestController {
-  constructor(private listingsLatestService: ListingsLatestService) {}
+// @Controller('api')
+// export class ListingsLatestController {
+//   constructor(private listingsLatestService: ListingsLatestService) {}
 
-  @Post('listings/latest')
-  async fetchData(): Promise<any> {
-    return await this.listingsLatestService.fetchLatestListings();
-  }
+//   @Post('listings/latest')
+//   async fetchData(): Promise<any> {
+//     return await this.listingsLatestService.fetchLatestListings();
+//   }
 
 
-  @Get('listings/latest')
-  async getListings(
-    @Query('start') start: string,
-    @Query('limit') limit: string,
-  ): Promise<LatestListing[]> {
-    const parsedStart = parseInt(start, 10) || 1;
-    const parsedLimit = parseInt(limit, 10) || 10;
+//   @Get('listings/latest')
+//   async getListings(
+//     @Query('start') start: string,
+//     @Query('limit') limit: string,
+//   ): Promise<LatestListing[]> {
+//     const parsedStart = parseInt(start, 10) || 1;
+//     const parsedLimit = parseInt(limit, 10) || 10;
 
-    return this.listingsLatestService.getListingsWithPagination(parsedStart, parsedLimit);
-  }
-}
+//     return this.listingsLatestService.getListingsWithPagination(parsedStart, parsedLimit);
+//   }
+// }

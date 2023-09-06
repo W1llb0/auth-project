@@ -4,47 +4,1551 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgres://postgres:root@localhost:5432/courses"
 }
 
 model Users {
+  id                                Int                       @id @default(autoincrement())
+  firstName                         String?                   @db.VarChar(255)
+  lastName                          String?                   @db.VarChar(255)
+  phone                             String?                   @db.VarChar(255)
+  email                             String?                   @db.VarChar(255)
+  avatar                            String?                   @db.VarChar(255)
+  role                              String?                   @db.VarChar(255)
+  status                            Boolean?
+  verifiedAt                        String?                   @db.VarChar(255)
+  createdAt                         DateTime                  @db.Timestamptz(6)
+  updatedAt                         DateTime                  @updatedAt @db.Timestamptz(6)
+  facebookId                        String?                   @db.VarChar(255)
+  vkId                              String?                   @db.VarChar(255)
+  googleId                          String?                   @db.VarChar(255)
+  location                          String?                   @db.VarChar(255)
+  isVerified                        Boolean?
+  newEmail                          String?                   @db.VarChar(255)
+  authType                          String?                   @db.VarChar(255)
+  tutorialDone                      Boolean?
+  activeCampaignId                  Int?
+  testsEnabled                      Boolean?
+  amoCRMId                          Int?
+  emailVerified                     Boolean?                  @default(false)
+  phoneVerified                     Boolean?                  @default(false)
+  deviceLimit                       Int?
+  greetingSMSSent                   Boolean?                  @default(false)
+  getCourseId                       String?                   @db.VarChar(255)
+  AdminVisits                       AdminVisits[]
+  AutoLoginCodes                    AutoLoginCodes[]
+  Certificates                      Certificates[]
+  CommentNotifications              CommentNotifications[]
+  CourseComments                    CourseComments[]
+  CourseFavourites                  CourseFavourites[]
+  CourseRatings                     CourseRatings[]
+  CreditRequests                    CreditRequests[]
+  ExtraSpendings                    ExtraSpendings[]
+  Favourites                        Favourites[]
+  GiftCodes_GiftCodes_usedByToUsers GiftCodes[]               @relation("GiftCodes_usedByToUsers")
+  GiftCodes_GiftCodes_userIdToUsers GiftCodes[]               @relation("GiftCodes_userIdToUsers")
+  LastLessons                       LastLessons[]
+  LessonNotes                       LessonNotes[]
+  MailingList                       MailingList[]
+  Passwords                         Passwords[]
+  PaymentMethods                    PaymentMethods[]
+  Permissions                       Permissions[]
+  PhoneAuthMigrationCodes           PhoneAuthMigrationCodes[]
+  PotentialDeals                    PotentialDeals[]
+  PracticeRequests                  PracticeRequests[]
+  PracticeSessions                  PracticeSessions[]
+  RefreshTokens                     RefreshTokens[]
+  ResetPasswordCodes                ResetPasswordCodes[]
+  SpeakerNotifications              SpeakerNotifications[]
+  Speakers                          Speakers[]
+  SubscriptionCharges               SubscriptionCharges[]
+  SubscriptionPromoCodes            SubscriptionPromoCodes[]
+  Subscriptions                     Subscriptions[]
+  TestResults                       TestResults[]
+  Transactions                      Transactions[]
+  UsedPromoCodes                    UsedPromoCodes[]
+  UserDevices                       UserDevices[]
+  UserReviews                       UserReviews[]
+  UserSignUpParams                  UserSignUpParams[]
+  UserUnlockedLessons               UserUnlockedLessons[]
+  VerifyEmailCodes                  VerifyEmailCodes[]
+  VideoComments                     VideoComments[]
+  VideoProgress                     VideoProgress[]
+  VideoRatings                      VideoRatings[]
+  Visits                            Visits[]
+}
+
+model ActiveCampaignCourseBindings {
+  id                    Int      @id @default(autoincrement())
+  courseId              Int?
+  tagSubscriptionPaid   Int?
+  tagPurchasePaid       Int?
+  tagAllPaid            Int?
+  listSubscription      Int?
+  listPurchase          Int?
+  listAll               Int?
+  createdAt             DateTime @db.Timestamptz(6)
+  updatedAt             DateTime @db.Timestamptz(6)
+  tagSubscriptionUnpaid Int?
+  tagPurchaseUnpaid     Int?
+  tagAllUnpaid          Int?
+  dealGroup             Int?
+  ACInitialStage        Int?
+  ACSuccessStage        Int?
+  ACSubscriptionTag     Int?
+  ACRefundedStage       Int?
+  Courses               Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model AdminVisits {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  path        String?  @db.VarChar(255)
+  method      String?  @db.VarChar(255)
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  Users       Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Agreements {
   id        Int      @id @default(autoincrement())
-  email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  type      String?  @db.VarChar(255)
+  text      String?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
 }
 
-model Cryptocurrency {
-  id                    Int      @id
-  rank                  Int
-  name                  String
-  symbol                String
-  slug                  String
-  is_active             Int
-  first_historical_data DateTime
-  last_historical_data  DateTime
-  platform              Json     @db.Json
+model AmoCRMCourseBindings {
+  id              Int      @id @default(autoincrement())
+  courseId        Int?
+  pipelineId      Int?
+  initialStage    Int?
+  processingStage Int?
+  successStage    Int?
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+  refundedStage   Int?
+  vendorCodeId    Int?
+  coursePage      Int?
+  Courses         Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-model LatestListing {
-  id                               Int      @id
-  name                             String
-  symbol                           String
-  slug                             String
-  cmc_rank                         Int
-  num_market_pairs                 Int
-  circulating_supply               Float
-  total_supply                     Float
-  market_cap_by_total_supply       Int?
-  max_supply                       Float?
-  infinite_supply                  Boolean
-  last_updated                     DateTime
-  date_added                       DateTime
-  tags                             String[]
-  self_reported_circulating_supply Float?
-  self_reported_market_cap         Float?
-  tvl_ratio                        Int?
-  platform                         Json?    @db.Json
-  quote                            Json     @db.Json
+model AnnouncedSpeakers {
+  id           Int      @id @default(autoincrement())
+  firstName    String?  @db.VarChar(255)
+  lastName     String?  @db.VarChar(255)
+  avatar       String?  @db.VarChar(255)
+  title        String?
+  createdAt    DateTime @db.Timestamptz(6)
+  updatedAt    DateTime @db.Timestamptz(6)
+  priority     Int?
+  avatarMobile String?  @db.VarChar(255)
+  description  String?
+}
+
+model AutoLoginCodes {
+  id        Int      @id @default(autoincrement())
+  code      String?  @db.VarChar(255)
+  userId    Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Bundles {
+  id            Int             @id @default(autoincrement())
+  name          String?         @db.VarChar(255)
+  price         Int?
+  createdAt     DateTime        @db.Timestamptz(6)
+  updatedAt     DateTime        @db.Timestamptz(6)
+  CourseBundles CourseBundles[]
+}
+
+model Categories {
+  id               Int                @id(map: "CourseCategories_pkey") @default(autoincrement())
+  name             String?            @db.VarChar(255)
+  duration         Int?
+  price            Int?
+  createdAt        DateTime           @db.Timestamptz(6)
+  updatedAt        DateTime           @db.Timestamptz(6)
+  path             String?            @db.VarChar(255)
+  CourseCategories CourseCategories[]
+  Courses          Courses[]
+}
+
+model Certificates {
+  id           Int      @id @default(autoincrement())
+  courseId     Int?
+  userId       Int?
+  serialNumber String?  @db.VarChar(255)
+  filename     String?  @db.VarChar(255)
+  createdAt    DateTime @db.Timestamptz(6)
+  updatedAt    DateTime @db.Timestamptz(6)
+  type         String?  @db.VarChar(255)
+  Courses      Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users        Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CommentNotifications {
+  id                                                                 Int             @id @default(autoincrement())
+  userId                                                             Int?
+  commentId                                                          Int?
+  replyId                                                            Int?
+  videoId                                                            Int?
+  isReceived                                                         Boolean?
+  createdAt                                                          DateTime        @db.Timestamptz(6)
+  updatedAt                                                          DateTime        @db.Timestamptz(6)
+  relatedReplyId                                                     Int?
+  visible                                                            Boolean?        @default(true)
+  VideoComments                                                      VideoComments?  @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  CommentReplies_CommentNotifications_relatedReplyIdToCommentReplies CommentReplies? @relation("CommentNotifications_relatedReplyIdToCommentReplies", fields: [relatedReplyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  CommentReplies_CommentNotifications_replyIdToCommentReplies        CommentReplies? @relation("CommentNotifications_replyIdToCommentReplies", fields: [replyId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users                                                              Users?          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Videos                                                             Videos?         @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CommentReplies {
+  id                                                                       Int                    @id @default(autoincrement())
+  commentId                                                                Int?
+  userId                                                                   Int?
+  text                                                                     String?
+  createdAt                                                                DateTime               @db.Timestamptz(6)
+  updatedAt                                                                DateTime               @db.Timestamptz(6)
+  isEdited                                                                 Boolean?
+  replyId                                                                  Int?
+  visible                                                                  Boolean?               @default(true)
+  CommentNotifications_CommentNotifications_relatedReplyIdToCommentReplies CommentNotifications[] @relation("CommentNotifications_relatedReplyIdToCommentReplies")
+  CommentNotifications_CommentNotifications_replyIdToCommentReplies        CommentNotifications[] @relation("CommentNotifications_replyIdToCommentReplies")
+  VideoComments                                                            VideoComments?         @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  CommentReplies                                                           CommentReplies?        @relation("CommentRepliesToCommentReplies", fields: [replyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_CommentReplies                                                     CommentReplies[]       @relation("CommentRepliesToCommentReplies")
+}
+
+model CountdownTimerAdjustments {
+  id              Int              @id @default(autoincrement())
+  timerId         Int?
+  endDate         DateTime?        @db.Timestamptz(6)
+  createdAt       DateTime         @db.Timestamptz(6)
+  updatedAt       DateTime         @db.Timestamptz(6)
+  CountdownTimers CountdownTimers? @relation(fields: [timerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CountdownTimers {
+  id                        Int                         @id @default(autoincrement())
+  caption                   String?                     @db.VarChar(255)
+  type                      String?                     @db.VarChar(255)
+  discount                  Float?
+  expirationAt              DateTime?                   @db.Timestamptz(6)
+  createdAt                 DateTime                    @db.Timestamptz(6)
+  updatedAt                 DateTime                    @db.Timestamptz(6)
+  desktopBackground         String?                     @db.VarChar(255)
+  tabletBackground          String?                     @db.VarChar(255)
+  mobileBackground          String?                     @db.VarChar(255)
+  text                      String?
+  textMobile                String?
+  showBanner                Boolean?                    @default(false)
+  CountdownTimerAdjustments CountdownTimerAdjustments[]
+}
+
+model CourseAssociatedSpeakers {
+  id          Int      @id @default(autoincrement())
+  courseId    Int?
+  firstName   String?  @db.VarChar(255)
+  lastName    String?  @db.VarChar(255)
+  description String?
+  image       String?  @db.VarChar(255)
+  imageMobile String?  @db.VarChar(255)
+  order       Int?     @default(0)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  Courses     Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseBundles {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  bundleId  Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Bundles   Bundles? @relation(fields: [bundleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseCategories {
+  id         Int         @id(map: "CourseCategories_pkey1") @default(autoincrement())
+  courseId   Int?
+  categoryId Int?
+  createdAt  DateTime    @db.Timestamptz(6)
+  updatedAt  DateTime    @db.Timestamptz(6)
+  Categories Categories? @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Courses    Courses?    @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseComments {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  userId    Int?
+  text      String?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseFAQ {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  question  String?
+  answer    String?
+  order     Int?     @default(0)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseFavourites {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  courseId  Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseLeadMagnets {
+  id                 Int      @id @default(autoincrement())
+  courseId           Int?
+  visible            Boolean? @default(false)
+  text               String?
+  image              String?  @db.VarChar(255)
+  ACSubscriptionList Int?
+  createdAt          DateTime @db.Timestamptz(6)
+  updatedAt          DateTime @db.Timestamptz(6)
+  ACSubscriptionTag  Int?
+  thanksText         String?
+  title              String?  @db.VarChar(255)
+  buttonText         String?  @db.VarChar(255)
+  formText           String?
+  Courses            Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseLearningBenefits {
+  id          Int      @id @default(autoincrement())
+  courseId    Int?
+  caption     String?  @db.VarChar(255)
+  text        String?
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  laptopImage String?
+  phoneImage  String?
+  Courses     Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseMasterInformation {
+  id                Int       @id @default(autoincrement())
+  speakerId         Int?
+  caption           String?   @db.VarChar(255)
+  text              String?
+  filename          String?   @db.VarChar(255)
+  createdAt         DateTime  @db.Timestamptz(6)
+  updatedAt         DateTime  @db.Timestamptz(6)
+  captionSize       Int?
+  captionSizeMobile Int?
+  Speakers          Speakers? @relation(fields: [speakerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseMaterials {
+  id           Int      @id @default(autoincrement())
+  title        String?  @db.VarChar(255)
+  filename     String?  @db.VarChar(255)
+  extension    String?  @db.VarChar(255)
+  courseId     Int?
+  createdAt    DateTime @db.Timestamptz(6)
+  updatedAt    DateTime @db.Timestamptz(6)
+  originalName String?  @db.VarChar(255)
+  Courses      Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseRatings {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  userId    Int?
+  rating    Float?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseReleaseMailingList {
+  id               Int      @id @default(autoincrement())
+  courseId         Int?
+  createdAt        DateTime @db.Timestamptz(6)
+  updatedAt        DateTime @db.Timestamptz(6)
+  activeCampaignId Int?
+  Courses          Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseReviews {
+  id         Int       @id @default(autoincrement())
+  courseId   Int?
+  text       String?
+  createdAt  DateTime  @db.Timestamptz(6)
+  updatedAt  DateTime  @db.Timestamptz(6)
+  avatar     String?   @db.VarChar(255)
+  name       String?   @db.VarChar(255)
+  date       DateTime? @db.Timestamptz(6)
+  occupation String?   @db.VarChar(255)
+  type       String?   @db.VarChar(255)
+  order      Int?      @default(0)
+  disabled   Boolean?  @default(false)
+  Courses    Courses?  @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseTargetAudiences {
+  id          Int      @id @default(autoincrement())
+  courseId    Int?
+  title       String?  @db.VarChar(255)
+  description String?
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  Courses     Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseTopics {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  text      String?  @db.VarChar(255)
+  order     Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseTopicsPractical {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  text      String?  @db.VarChar(255)
+  order     Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model CourseTrailers {
+  id           Int      @id @default(autoincrement())
+  filename     String?  @db.VarChar(255)
+  courseId     Int?
+  createdAt    DateTime @db.Timestamptz(6)
+  updatedAt    DateTime @db.Timestamptz(6)
+  kinescopeUrl String?  @db.VarChar(255)
+  useKinescope Boolean? @default(false)
+  visible      Boolean? @default(true)
+  title        String?  @db.VarChar(255)
+  sectionTitle String?
+  Courses      Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CourseVideoFragments {
+  id           Int      @id @default(autoincrement())
+  filename     String?  @db.VarChar(255)
+  courseId     Int?
+  createdAt    DateTime @db.Timestamptz(6)
+  updatedAt    DateTime @db.Timestamptz(6)
+  kinescopeUrl String?  @db.VarChar(255)
+  useKinescope Boolean? @default(false)
+  visible      Boolean? @default(true)
+  title        String?  @db.VarChar(255)
+  Courses      Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Courses {
+  id                           Int                            @id @default(autoincrement())
+  speakerId                    Int?
+  title                        String?                        @db.VarChar(255)
+  description                  String?
+  createdAt                    DateTime                       @db.Timestamptz(6)
+  updatedAt                    DateTime                       @db.Timestamptz(6)
+  categoryId                   Int?
+  cardImage                    String?                        @db.VarChar(255)
+  visible                      Boolean?                       @default(false)
+  available                    Boolean?                       @default(false)
+  friendlyId                   String?                        @db.VarChar(255)
+  title2                       String?                        @db.VarChar(255)
+  dashboardImage               String?                        @db.VarChar(255)
+  courseInfoImage              String?                        @db.VarChar(255)
+  coursePageImage              String?                        @db.VarChar(255)
+  statusText                   String?                        @db.VarChar(255)
+  abstract                     String?
+  cardImageMobile              String?                        @db.VarChar(255)
+  courseInfoImageMobile        String?                        @db.VarChar(255)
+  preOrderAvailable            Boolean?                       @default(false)
+  preOrderDiscount             Int?                           @default(0)
+  plannedReleaseDate           DateTime?                      @db.Timestamptz(6)
+  priority                     Int?
+  incomplete                   Boolean?                       @default(false)
+  plannedCompletionDate        DateTime?                      @db.Timestamptz(6)
+  discount                     Int?                           @default(0)
+  communityLink                String?                        @db.VarChar(255)
+  ACCompletionTag              Int?
+  vendorCode                   Int?
+  novelty                      Boolean?                       @default(false)
+  popular                      Boolean?                       @default(false)
+  metaTitle                    String?
+  metaDescription              String?
+  bestseller                   Boolean?
+  ACDemoLessonTag              Int?
+  hidden                       Boolean?                       @default(false)
+  practical                    Boolean?                       @default(false)
+  practicalCourseReady         Boolean?                       @default(false)
+  startDate                    DateTime?                      @db.Timestamptz(6)
+  exactStartDate               Boolean?                       @default(true)
+  releaseMailSent              Boolean?                       @default(false)
+  titlePractical               String?                        @db.VarChar(255)
+  completionMailSent           Boolean?                       @default(false)
+  archived                     Boolean?                       @default(false)
+  type                         String?                        @db.VarChar(255)
+  noIntro                      Boolean?                       @default(false)
+  isFreeCourse                 Boolean?                       @default(false)
+  includeInPass                Boolean?                       @default(true)
+  materialsInfo                String?
+  durationInfo                 String?
+  backgroundVideo              String?                        @db.VarChar(255)
+  cardImageCollection          String?                        @db.VarChar(255)
+  cardImageCollectionMobile    String?                        @db.VarChar(255)
+  backgroundVideoMobile        String?                        @db.VarChar(255)
+  kinescopeFolder              String?                        @db.VarChar(255)
+  plan1                        String?                        @db.VarChar(255)
+  plan2                        String?                        @db.VarChar(255)
+  plan3                        String?                        @db.VarChar(255)
+  availableOnlyInSubscription  Boolean?                       @default(false)
+  ActiveCampaignCourseBindings ActiveCampaignCourseBindings[]
+  AmoCRMCourseBindings         AmoCRMCourseBindings[]
+  Certificates                 Certificates[]
+  CourseAssociatedSpeakers     CourseAssociatedSpeakers[]
+  CourseBundles                CourseBundles[]
+  CourseCategories             CourseCategories[]
+  CourseComments               CourseComments[]
+  CourseFAQ                    CourseFAQ[]
+  CourseFavourites             CourseFavourites[]
+  CourseLeadMagnets            CourseLeadMagnets[]
+  CourseLearningBenefits       CourseLearningBenefits[]
+  CourseMaterials              CourseMaterials[]
+  CourseRatings                CourseRatings[]
+  CourseReleaseMailingList     CourseReleaseMailingList[]
+  CourseReviews                CourseReviews[]
+  CourseTargetAudiences        CourseTargetAudiences[]
+  CourseTopics                 CourseTopics[]
+  CourseTopicsPractical        CourseTopicsPractical[]
+  CourseTrailers               CourseTrailers[]
+  CourseVideoFragments         CourseVideoFragments[]
+  Categories                   Categories?                    @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Speakers                     Speakers?                      @relation(fields: [speakerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Favourites                   Favourites[]
+  LastLessons                  LastLessons[]
+  LessonNotes                  LessonNotes[]
+  PracticalLessons             PracticalLessons[]
+  RelevantCourses              RelevantCourses[]
+  RiggedCourseRatings          RiggedCourseRatings[]
+  SpeakerAwards                SpeakerAwards[]
+  SpeakerProjects              SpeakerProjects[]
+  Tests                        Tests[]
+  UserReviews                  UserReviews[]
+  Videos                       Videos[]
+}
+
+model CreditRequests {
+  id            Int      @id @default(autoincrement())
+  userId        Int?
+  relatedItemId Int?
+  type          String?  @db.VarChar(255)
+  amoCRMDealId  Int?
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+  Users         Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model CustomCommissions {
+  id         Int       @id @default(autoincrement())
+  speakerId  Int?
+  commission Float?
+  createdAt  DateTime  @db.Timestamptz(6)
+  updatedAt  DateTime  @db.Timestamptz(6)
+  Speakers   Speakers? @relation(fields: [speakerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Emails {
+  id        Int       @id @default(autoincrement())
+  speakerId Int?
+  email     String?   @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  Speakers  Speakers? @relation(fields: [speakerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ExtraSpendingFiles {
+  id             Int             @id @default(autoincrement())
+  expenseId      Int?
+  filename       String?         @db.VarChar(255)
+  createdAt      DateTime        @db.Timestamptz(6)
+  updatedAt      DateTime        @db.Timestamptz(6)
+  ExtraSpendings ExtraSpendings? @relation(fields: [expenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ExtraSpendings {
+  id                 Int                  @id @default(autoincrement())
+  userId             Int?
+  description        String?
+  createdAt          DateTime             @db.Timestamptz(6)
+  updatedAt          DateTime             @db.Timestamptz(6)
+  amount             Float?
+  title              String?              @db.VarChar(255)
+  receiver           String?              @db.VarChar(255)
+  ExtraSpendingFiles ExtraSpendingFiles[]
+  Users              Users?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  HistoryEntries     HistoryEntries[]
+}
+
+model Favourites {
+  id        Int      @id(map: "Bookmarks_pkey") @default(autoincrement())
+  userId    Int?
+  videoId   Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  courseId  Int?
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Bookmarks_userId_fkey")
+  Videos    Videos?  @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Bookmarks_videoId_fkey")
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model FortunaAcquiredPromoCodes {
+  id        Int      @id @default(autoincrement())
+  phone     String?  @db.VarChar(255)
+  code      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model GiftCodes {
+  id                            Int      @id @default(autoincrement())
+  userId                        Int?
+  email                         String?  @db.VarChar(255)
+  transactionId                 String?  @db.VarChar(255)
+  code                          String?  @db.VarChar(255)
+  isUsed                        Boolean? @default(false)
+  createdAt                     DateTime @db.Timestamptz(6)
+  updatedAt                     DateTime @db.Timestamptz(6)
+  firstName                     String?  @db.VarChar(255)
+  lastName                      String?  @db.VarChar(255)
+  giftType                      String?  @db.VarChar(255)
+  promoCode                     String?  @db.VarChar(255)
+  filename                      String?  @db.VarChar(255)
+  relatedItemId                 Int?
+  tariff                        String?  @db.VarChar(255)
+  usedBy                        Int?
+  Users_GiftCodes_usedByToUsers Users?   @relation("GiftCodes_usedByToUsers", fields: [usedBy], references: [id], onUpdate: NoAction)
+  Users_GiftCodes_userIdToUsers Users?   @relation("GiftCodes_userIdToUsers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model GiftPromoCodes {
+  id            Int       @id @default(autoincrement())
+  code          String?   @db.VarChar(255)
+  tariff        String?   @db.VarChar(255)
+  expirationAt  DateTime? @db.Timestamptz(6)
+  relatedItemId Int?
+  createdAt     DateTime  @db.Timestamptz(6)
+  updatedAt     DateTime  @db.Timestamptz(6)
+}
+
+model HistoryEntries {
+  id             Int             @id @default(autoincrement())
+  expenseId      Int?
+  field          String?         @db.VarChar(255)
+  oldValue       String?
+  newValue       String?
+  isFile         Boolean?
+  isDeleted      Boolean?
+  createdAt      DateTime        @db.Timestamptz(6)
+  updatedAt      DateTime        @db.Timestamptz(6)
+  ExtraSpendings ExtraSpendings? @relation(fields: [expenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InstagramPosts {
+  id            Int      @id @default(autoincrement())
+  commentsCount Int?
+  likesCount    Int?
+  thumbnail     String?
+  link          String?
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model KinescopeData {
+  id        Int       @default(autoincrement())
+  videoId   String?   @db.VarChar(255)
+  userId    Int?
+  watchTime Int?
+  date      DateTime? @db.Timestamptz(6)
+  hash      String    @id @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+}
+
+model KinescopeLessonVideos {
+  id               Int      @id @default(autoincrement())
+  lessonId         Int?
+  kinescopeVideoId String?  @db.VarChar(255)
+  shortId          Int?
+  duration         Float?
+  title            String?  @db.VarChar(255)
+  posterOriginal   String?
+  posterMd         String?
+  posterSm         String?
+  posterXs         String?
+  createdAt        DateTime @db.Timestamptz(6)
+  height           Int?
+  width            Int?
+  updatedAt        DateTime @db.Timestamptz(6)
+  Videos           Videos?  @relation(fields: [lessonId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model KinescopeTrailerVideos {
+  id               Int      @id @default(autoincrement())
+  relatedItemId    Int?
+  type             String?  @db.VarChar(255)
+  kinescopeVideoId String?  @db.VarChar(255)
+  shortId          Int?
+  duration         Float?
+  title            String?  @db.VarChar(255)
+  createdAt        DateTime @db.Timestamptz(6)
+  height           Int?
+  width            Int?
+  updatedAt        DateTime @db.Timestamptz(6)
+  posterOriginal   String?
+  posterMd         String?
+  posterSm         String?
+  posterXs         String?
+}
+
+model LastLessons {
+  id        Int      @id @default(autoincrement())
+  lessonId  Int?
+  userId    Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  courseId  Int?
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Videos    Videos?  @relation(fields: [lessonId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model LearningBenefits {
+  id          Int      @id @default(autoincrement())
+  caption     String?  @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  text        String?
+  laptopImage String?
+  phoneImage  String?
+}
+
+model LessonNotes {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  courseId  Int?
+  videoId   Int?
+  text      String?
+  time      Float?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Videos    Videos?  @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model MailCoupons {
+  id        Int      @id @default(autoincrement())
+  code      String?  @db.VarChar(255)
+  userId    Int?
+  campaign  String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model MailTemplates {
+  id             Int      @id @default(autoincrement())
+  templateId     String?  @db.VarChar(255)
+  name           String?  @db.VarChar(255)
+  templateEngine String?  @db.VarChar(255)
+  createdAt      DateTime @db.Timestamptz(6)
+  updatedAt      DateTime @db.Timestamptz(6)
+}
+
+model MailingFeedback {
+  id        Int      @id @default(autoincrement())
+  type      String?  @db.VarChar(255)
+  text      String?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model MailingList {
+  id              Int      @id @default(autoincrement())
+  name            String?  @db.VarChar(255)
+  email           String?  @db.VarChar(255)
+  userId          Int?
+  unsubscribeCode String?  @db.VarChar(255)
+  isReceiving     Boolean?
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+  Users           Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model MainTrailers {
+  id        Int      @id @default(autoincrement())
+  filename  String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model MediaConvertJobs {
+  id        Int      @id @default(autoincrement())
+  jobId     String?  @db.VarChar(255)
+  status    String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model PassDiscounts {
+  id                  Int                  @id @default(autoincrement())
+  amount              Float?
+  oldPrice            Float?
+  newPrice            Float?
+  message             String?
+  createdAt           DateTime             @db.Timestamptz(6)
+  updatedAt           DateTime             @db.Timestamptz(6)
+  subscriptionId      Int?
+  SubscriptionDetails SubscriptionDetails? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Passwords {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  password  String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PaymentMethods {
+  id              Int      @id @default(autoincrement())
+  userId          Int?
+  paymentMethodId String?  @db.VarChar(255)
+  cardFirst6      Int?
+  cardLast4       Int?
+  cardExpiryMonth Int?
+  cardExpireYear  Int?
+  cardType        String?  @db.VarChar(255)
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+  Users           Users?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Permissions {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  type      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PhoneAuthMigrationCodes {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  code      String?  @db.VarChar(255)
+  email     String?  @db.VarChar(255)
+  isUsed    Boolean? @default(false)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PhoneConfirmationCodes {
+  id        Int      @id @default(autoincrement())
+  phone     String?  @db.VarChar(255)
+  code      String?  @db.VarChar(255)
+  isUsed    Boolean? @default(false)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model Phones {
+  id        Int       @id @default(autoincrement())
+  speakerId Int?
+  phone     String?   @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  Speakers  Speakers? @relation(fields: [speakerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model PotentialDeals {
+  id                Int      @id @default(autoincrement())
+  userId            Int?
+  callerCourseId    Int?
+  amoCRMDealId      Int?
+  type              String?  @db.VarChar(255)
+  purchaseInitiated Boolean? @default(false)
+  createdAt         DateTime @db.Timestamptz(6)
+  updatedAt         DateTime @db.Timestamptz(6)
+  variant           String?  @db.VarChar(255)
+  Users             Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PracticalLessons {
+  id                    Int      @default(autoincrement())
+  courseId              Int?
+  passingGrade          Float?   @default(0)
+  title                 String?  @db.VarChar(255)
+  description           String?
+  duration              Int?
+  resourceId            String   @id @db.VarChar(255)
+  order                 Int?     @default(0)
+  createdAt             DateTime @db.Timestamptz(6)
+  updatedAt             DateTime @db.Timestamptz(6)
+  type                  String?  @db.VarChar(255)
+  disabled              Boolean? @default(false)
+  certificateCheckpoint Boolean? @default(false)
+  Courses               Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model PracticeRequests {
+  id            Int      @id @default(autoincrement())
+  userId        Int?
+  relatedItemId Int?
+  amoCRMDealId  Int?
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+  name          String?
+  email         String?
+  phone         String?
+  Users         Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PracticeSessions {
+  id        Int      @id @default(autoincrement())
+  grade     Float?   @default(0)
+  passed    Boolean? @default(false)
+  lessonId  String?  @db.VarChar(255)
+  sessionId String?  @db.VarChar(255)
+  nonce     String?  @db.VarChar(255)
+  userId    Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  completed Boolean? @default(false)
+  resultId  String?  @db.VarChar(255)
+  onReview  Boolean? @default(false)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model PromoCodes {
+  id                      Int       @id @default(autoincrement())
+  code                    String?   @db.VarChar(255)
+  discount                Float?
+  createdAt               DateTime  @db.Timestamptz(6)
+  updatedAt               DateTime  @db.Timestamptz(6)
+  amount                  Int?
+  type                    String?   @db.VarChar(255)
+  expirationAt            DateTime? @db.Timestamptz(6)
+  relatedItemId           Int?
+  units                   String?   @default("percent") @db.VarChar(255)
+  compatibleWithDiscounts Boolean?  @default(true)
+  maxDiscount             Boolean?  @default(false)
+  userId                  Int?
+}
+
+model RefreshTokens {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  key       String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model RelevantCourses {
+  id         Int      @id @default(autoincrement())
+  courseId   Int?
+  relevantId Int?
+  type       String?  @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+  Courses    Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResetPasswordCodes {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  code      String?  @db.VarChar(255)
+  isUsed    Boolean? @default(false)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model RiggedCourseRatings {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  rating    Float?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SequelizeMeta {
+  name String @id @db.VarChar(255)
+}
+
+model SignUpEmailCodes {
+  id        Int      @id @default(autoincrement())
+  email     String?  @db.VarChar(255)
+  code      String?  @db.VarChar(255)
+  isUsed    Boolean? @default(false)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model SocialAnnouncements {
+  id        Int      @id @default(autoincrement())
+  text      String?  @default("")
+  type      String?  @db.VarChar(255)
+  image     String?  @db.VarChar(255)
+  name      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  url       String?  @db.VarChar(255)
+  avatar    String?  @db.VarChar(255)
+}
+
+model SocialLinks {
+  id        Int      @id @default(autoincrement())
+  type      String?  @db.VarChar(255)
+  link      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model SpeakerAwards {
+  id        Int      @id @default(autoincrement())
+  image     String?  @db.VarChar(255)
+  title     String?  @db.VarChar(255)
+  order     Int?
+  courseId  Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SpeakerContracts {
+  id        Int       @id @default(autoincrement())
+  speakerId Int?
+  filename  String?   @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  Speakers  Speakers? @relation(fields: [speakerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SpeakerLeads {
+  id            Int       @default(autoincrement())
+  relatedItemId Int?
+  leadId        Int       @id
+  name          String?   @db.VarChar(255)
+  amount        Float?
+  status        Int?
+  pipeline      Int?
+  leadCreatedAt DateTime? @db.Timestamptz(6)
+  leadClosedAt  DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @db.Timestamptz(6)
+  updatedAt     DateTime  @db.Timestamptz(6)
+}
+
+model SpeakerNotifications {
+  id        Int       @id @default(autoincrement())
+  speakerId Int?
+  userId    Int?
+  text      String?
+  type      String?   @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  Speakers  Speakers? @relation(fields: [speakerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users     Users?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SpeakerProjects {
+  id        Int      @id @default(autoincrement())
+  courseId  Int?
+  image     String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Courses   Courses? @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model SpeakerSignatures {
+  id        Int       @id @default(autoincrement())
+  speakerId Int?
+  filename  String?   @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  Speakers  Speakers? @relation(fields: [speakerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Speakers {
+  id                      Int                       @id @default(autoincrement())
+  firstName               String?                   @db.VarChar(255)
+  middleName              String?                   @db.VarChar(255)
+  lastName                String?                   @db.VarChar(255)
+  alias                   String?                   @db.VarChar(255)
+  description             String?
+  avatar                  String?                   @db.VarChar(255)
+  createdAt               DateTime                  @db.Timestamptz(6)
+  updatedAt               DateTime                  @db.Timestamptz(6)
+  occupation              String?                   @db.VarChar(255)
+  gender                  String?                   @db.VarChar(255)
+  userId                  Int?
+  customNameGenitive      String?                   @db.VarChar(255)
+  CourseMasterInformation CourseMasterInformation[]
+  Courses                 Courses[]
+  CustomCommissions       CustomCommissions[]
+  Emails                  Emails[]
+  Phones                  Phones[]
+  SpeakerContracts        SpeakerContracts[]
+  SpeakerNotifications    SpeakerNotifications[]
+  SpeakerSignatures       SpeakerSignatures[]
+  Users                   Users?                    @relation(fields: [userId], references: [id], onUpdate: NoAction)
+}
+
+model SubscriptionCharges {
+  id             Int      @id @default(autoincrement())
+  userId         Int?
+  subscriptionId String?  @db.VarChar(255)
+  amount         Float?
+  createdAt      DateTime @db.Timestamptz(6)
+  updatedAt      DateTime @db.Timestamptz(6)
+  Users          Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SubscriptionDetails {
+  id            Int             @id(map: "Subscribes_pkey") @default(autoincrement())
+  price         Int?
+  duration      Int?
+  createdAt     DateTime        @db.Timestamptz(6)
+  updatedAt     DateTime        @db.Timestamptz(6)
+  durationUnits String?         @db.VarChar(255)
+  type          String?         @db.VarChar(255)
+  PassDiscounts PassDiscounts[]
+}
+
+model SubscriptionDiscounts {
+  id                 Int                 @id(map: "Discounts_pkey") @default(autoincrement())
+  amount             Float?
+  oldPrice           Float?
+  newPrice           Float?
+  message            String?
+  createdAt          DateTime            @db.Timestamptz(6)
+  updatedAt          DateTime            @db.Timestamptz(6)
+  priceId            Int?
+  SubscriptionPrices SubscriptionPrices? @relation(fields: [priceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SubscriptionPriceAdjustments {
+  id                 Int                 @id @default(autoincrement())
+  priceId            Int?
+  newPrice           Int?
+  percentage         Int?
+  startDate          DateTime?           @db.Timestamptz(6)
+  createdAt          DateTime            @db.Timestamptz(6)
+  updatedAt          DateTime            @db.Timestamptz(6)
+  installmentsCount  Int?
+  installmentPrice   Float?
+  SubscriptionPrices SubscriptionPrices? @relation(fields: [priceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SubscriptionPrices {
+  id                           Int                            @id(map: "CoursePrices_pkey") @default(autoincrement())
+  type                         String?                        @db.VarChar(255)
+  amount                       Float?
+  createdAt                    DateTime                       @db.Timestamptz(6)
+  updatedAt                    DateTime                       @db.Timestamptz(6)
+  duration                     Int?
+  durationUnits                String?                        @db.VarChar(255)
+  relatedItemId                Int?
+  disabled                     Boolean?                       @default(false)
+  unlimited                    Boolean?                       @default(false)
+  variant                      String?                        @db.VarChar(255)
+  installmentPrice             Float?
+  startDate                    DateTime?                      @db.Timestamptz(6)
+  exactStartDate               Boolean?                       @default(false)
+  extended                     Boolean?                       @default(false)
+  extensionAmount              Int?                           @default(0)
+  installmentsCount            Int?
+  SubscriptionDiscounts        SubscriptionDiscounts[]
+  SubscriptionPriceAdjustments SubscriptionPriceAdjustments[]
+}
+
+model SubscriptionPromoCodes {
+  id            Int       @id @default(autoincrement())
+  relatedItemId Int?
+  userId        Int?
+  promoCode     String?   @db.VarChar(255)
+  isUsed        Boolean?  @default(false)
+  expirationAt  DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @db.Timestamptz(6)
+  updatedAt     DateTime  @db.Timestamptz(6)
+  type          String?   @db.VarChar(255)
+  reusable      Boolean?  @default(false)
+  Users         Users?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Subscriptions {
+  id                      Int       @id @default(autoincrement())
+  userId                  Int?
+  transactionId           String?   @db.VarChar(255)
+  type                    String?   @db.VarChar(255)
+  relatedItemId           Int?
+  limited                 Boolean?  @default(false)
+  expirationAt            DateTime? @db.Timestamptz(6)
+  createdAt               DateTime  @db.Timestamptz(6)
+  updatedAt               DateTime  @db.Timestamptz(6)
+  isPreOrder              Boolean?  @default(false)
+  status                  String?   @default("active") @db.VarChar(255)
+  cancelledAt             DateTime? @db.Timestamptz(6)
+  refundStatus            DateTime? @db.Timestamptz(6)
+  variant                 String?   @db.VarChar(255)
+  recurringSubscriptionId String?   @db.VarChar(255)
+  extended                Boolean?  @default(false)
+  extensionPeriodExpired  Boolean?  @default(false)
+  plan                    String?   @db.VarChar(255)
+  Users                   Users?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Subtractions {
+  id         Int      @id @default(autoincrement())
+  tax        Float?
+  commission Float?
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model TestAnswers {
+  id            Int            @id @default(autoincrement())
+  text          String?
+  isCorrect     Boolean?       @default(false)
+  questionId    Int?
+  createdAt     DateTime       @db.Timestamptz(6)
+  updatedAt     DateTime       @db.Timestamptz(6)
+  image         String?        @db.VarChar(255)
+  order         Int?
+  TestQuestions TestQuestions? @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model TestQuestions {
+  id             Int           @id @default(autoincrement())
+  order          Int?
+  text           String?
+  multipleChoice Boolean?      @default(false)
+  testId         Int?
+  createdAt      DateTime      @db.Timestamptz(6)
+  updatedAt      DateTime      @db.Timestamptz(6)
+  type           String?       @db.VarChar(255)
+  commentary     String?
+  freeAnswer     Boolean?
+  TestAnswers    TestAnswers[]
+  Tests          Tests?        @relation(fields: [testId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  TestVideos     TestVideos[]
+}
+
+model TestResults {
+  id        Int      @id @default(autoincrement())
+  grade     Int?     @default(0)
+  passed    Boolean? @default(false)
+  testId    Int?
+  userId    Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Tests     Tests?   @relation(fields: [testId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model TestVideos {
+  id            Int            @id @default(autoincrement())
+  filename      String?        @db.VarChar(255)
+  questionId    Int?
+  createdAt     DateTime       @db.Timestamptz(6)
+  updatedAt     DateTime       @db.Timestamptz(6)
+  originalName  String?        @db.VarChar(255)
+  TestQuestions TestQuestions? @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Tests {
+  id               Int             @id @default(autoincrement())
+  passingGrade     Int?            @default(0)
+  createdAt        DateTime        @db.Timestamptz(6)
+  updatedAt        DateTime        @db.Timestamptz(6)
+  showAnswers      Boolean?        @default(true)
+  showResults      Boolean?        @default(true)
+  showRepeatButton Boolean?        @default(true)
+  showShareButtons Boolean?        @default(true)
+  visible          Boolean?        @default(true)
+  courseId         Int?
+  TestQuestions    TestQuestions[]
+  TestResults      TestResults[]
+  Courses          Courses?        @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model TransactionUTMData {
+  id            Int      @id @default(autoincrement())
+  transactionId String?  @db.VarChar(255)
+  type          String?  @db.VarChar(255)
+  value         String?  @db.VarChar(255)
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model Transactions {
+  id                             Int       @id @default(autoincrement())
+  userId                         Int?
+  transactionId                  String?   @db.VarChar(255)
+  status                         String?   @db.VarChar(255)
+  amount                         Int?
+  type                           String?   @db.VarChar(255)
+  relatedItemId                  Int?
+  capturedAt                     DateTime? @db.Timestamptz(6)
+  expirationAt                   DateTime? @db.Timestamptz(6)
+  createdAt                      DateTime  @db.Timestamptz(6)
+  updatedAt                      DateTime  @db.Timestamptz(6)
+  promoCode                      String?   @db.VarChar(255)
+  isGift                         Boolean?
+  duration                       Int?
+  durationUnits                  String?   @db.VarChar(255)
+  orderNumber                    String?   @db.VarChar(255)
+  paidOrNotified                 Boolean?  @default(false)
+  unlimited                      Boolean?  @default(false)
+  activeCampaignSuccessTag       Int?
+  errored                        Boolean?
+  description                    String?   @db.VarChar(255)
+  activeCampaignDealId           Int?
+  amoCRMDealId                   Int?
+  amoCRMSuccessStage             Int?
+  ACSuccessStage                 Int?
+  isPreOrder                     Boolean?  @default(false)
+  callerCourseId                 Int?
+  GTMEventPushed                 Boolean?  @default(false)
+  googleAnalyticsUserId          String?   @db.VarChar(255)
+  paymentUrl                     String?   @db.VarChar(255)
+  lastAbandonedCartReminder      DateTime? @db.Timestamptz(6)
+  abandonedCartNotificationsSent Int?      @default(0)
+  shortUrlError                  String?   @db.VarChar(255)
+  shortUrlAbandonedCart1         String?   @db.VarChar(255)
+  shortUrlAbandonedCart2         String?   @db.VarChar(255)
+  shortUrlRenewal                String?   @db.VarChar(255)
+  paymentType                    String?   @db.VarChar(255)
+  acquirer                       String?   @db.VarChar(255)
+  formUrl                        String?
+  paymentExpirationDate          DateTime? @db.Timestamptz(6)
+  variant                        String?   @db.VarChar(255)
+  processed                      Boolean?  @default(false)
+  bundledItems                   Int[]
+  recurringPaymentPeriod         String?   @db.VarChar(255)
+  recurringPaymentNextDate       DateTime? @db.Timestamptz(6)
+  recurringSubscriptionId        String?   @db.VarChar(255)
+  fbPixelCookie                  String?   @db.VarChar(255)
+  fbClIdCookie                   String?   @db.VarChar(255)
+  fbPurchaseEventId              String?   @db.VarChar(255)
+  clientIPAddress                String?   @db.VarChar(255)
+  clientUserAgent                String?
+  invalidPhone                   Boolean?  @default(false)
+  extended                       Boolean?  @default(false)
+  extensionAmount                Int?      @default(0)
+  shortUrlAbandonedCart3         String?   @db.VarChar(255)
+  shortUrlAbandonedCart4         String?   @db.VarChar(255)
+  shortUrlAbandonedCart5         String?   @db.VarChar(255)
+  upgrade                        Boolean?  @default(false)
+  notes                          String?
+  Users                          Users?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UpgradeRequests {
+  id            Int      @id @default(autoincrement())
+  transactionId String?  @db.VarChar(255)
+  amoCRMDealId  Int?
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model UsedPromoCodes {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  code      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UserDevices {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  deviceId  String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UserReviews {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  courseId   Int?
+  text       String?
+  socialLink String?
+  reviewLink String?
+  photo      String?  @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+  Courses    Courses? @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users      Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UserSignUpParams {
+  id             Int      @id @default(autoincrement())
+  userId         Int?
+  UTMSource      String?  @db.VarChar(255)
+  googleClientId String?  @db.VarChar(255)
+  createdAt      DateTime @db.Timestamptz(6)
+  updatedAt      DateTime @db.Timestamptz(6)
+  Users          Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model UserUnlockedLessons {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  lessonId  Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Videos    Videos?  @relation(fields: [lessonId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model VerifyEmailCodes {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  code      String?  @db.VarChar(255)
+  isUsed    Boolean? @default(false)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model VideoComments {
+  id                   Int                    @id @default(autoincrement())
+  videoId              Int?
+  userId               Int?
+  text                 String?
+  createdAt            DateTime               @db.Timestamptz(6)
+  updatedAt            DateTime               @db.Timestamptz(6)
+  isEdited             Boolean?
+  visible              Boolean?               @default(true)
+  CommentNotifications CommentNotifications[]
+  CommentReplies       CommentReplies[]
+  Users                Users?                 @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Videos               Videos?                @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model VideoEncryptCodes {
+  id        Int      @id @default(autoincrement())
+  key       String?  @db.VarChar(255)
+  code      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model VideoList {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(255)
+  videoId   Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Videos    Videos?  @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model VideoProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  videoId     Int?
+  time        Float?
+  isCompleted Boolean?
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  Users       Users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Videos      Videos?  @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model VideoRatings {
+  id        Int      @id @default(autoincrement())
+  videoId   Int?
+  userId    Int?
+  rating    Float?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Users     Users?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Videos    Videos?  @relation(fields: [videoId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Videos {
+  id                    Int                     @id @default(autoincrement())
+  courseId              Int?
+  title                 String?                 @db.VarChar(255)
+  filename              String?                 @db.VarChar(255)
+  views                 Int?
+  description           String?
+  createdAt             DateTime                @db.Timestamptz(6)
+  updatedAt             DateTime                @db.Timestamptz(6)
+  order                 Int?
+  thumbnail             String?                 @db.VarChar(255)
+  duration              Int?
+  isEncrypted           Boolean?
+  disabled              Boolean?                @default(false)
+  originalName          String?                 @db.VarChar(255)
+  filenameUpdatedAt     DateTime?               @db.Timestamptz(6)
+  type                  String?                 @default("lesson") @db.VarChar(255)
+  demoPlaybackDisabled  Boolean?                @default(false)
+  kinescopeUrl          String?                 @db.VarChar(255)
+  useKinescope          Boolean?                @default(false)
+  ACCompletionTag       Int?
+  freeLesson            Boolean?                @default(false)
+  moduleTitle           String?                 @db.VarChar(255)
+  speakerId             Int?
+  externalLink          String?                 @db.VarChar(255)
+  CommentNotifications  CommentNotifications[]
+  Favourites            Favourites[]
+  KinescopeLessonVideos KinescopeLessonVideos[]
+  LastLessons           LastLessons[]
+  LessonNotes           LessonNotes[]
+  UserUnlockedLessons   UserUnlockedLessons[]
+  VideoComments         VideoComments[]
+  VideoList             VideoList[]
+  VideoProgress         VideoProgress[]
+  VideoRatings          VideoRatings[]
+  Courses               Courses?                @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Visits {
+  id           Int       @id @default(autoincrement())
+  userId       Int?
+  createdAt    DateTime  @db.Timestamptz(6)
+  updatedAt    DateTime  @db.Timestamptz(6)
+  browser      String?   @db.VarChar(255)
+  os           String?   @db.VarChar(255)
+  lastActivity DateTime? @db.Timestamptz(6)
+  Users        Users?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
