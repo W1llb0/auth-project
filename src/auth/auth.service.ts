@@ -63,7 +63,7 @@ export class AuthService {
         greetingSMSSent: true,
         getCourseId: true,
       },
-    });
+    });// уменьшить
 
     return user;
   }
@@ -96,6 +96,7 @@ export class AuthService {
       });
 
       if (!user) throw new UnauthorizedException('User not found');
+      
       return this.generateTokenPair(user);
     } catch (error) {
       const message =
