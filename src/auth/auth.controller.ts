@@ -24,7 +24,7 @@ export class AuthController {
     private jwtService: JwtService,
   ) {}
 
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   @Post('register')
   async register(
     @Body() createUserDto: CreateUserDto,
@@ -71,6 +71,8 @@ export class AuthController {
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
     }
+
+    await this.authService.addToJwtBlackList(refreshToken, 'refresh');
 
     const { access_token: newAccessToken, refresh_token: newRefreshToken } =
       await this.authService.refreshTokens(refreshToken);
@@ -142,6 +144,20 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string }> {
+    const refreshToken = (req as any).cookies['refresh token'];
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    const accessToken = req.headers['authorization']?.split(' ')[1];
+    if (accessToken) {
+      await this.authService.addToJwtBlackList(accessToken, 'access');
+    }
+    // console.log( await this.authService.isTokenInBlackList(accessToken));
+
+    await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    
     res.cookie('refresh token', '', { httpOnly: true, maxAge: 0 });
 
     const invalidTokenPayload = { sub: -1, email: 'invalid@example.com' };

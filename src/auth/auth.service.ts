@@ -4,10 +4,11 @@ import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
 import { Users } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { TokenExpiredError } from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -63,7 +64,7 @@ export class AuthService {
         greetingSMSSent: true,
         getCourseId: true,
       },
-    });// уменьшить
+    }); // уменьшить
 
     return user;
   }
@@ -74,7 +75,10 @@ export class AuthService {
     const payload = { email: user.email, sub: user.id };
 
     const createToken = async (secret: string, expiresIn: string) =>
-      this.jwtService.signAsync(payload, { secret, expiresIn });
+      this.jwtService.signAsync(
+        { ...payload, jti: uuidv4() },
+        { secret, expiresIn },
+      );
 
     const [accessToken, refreshToken] = await Promise.all([
       createToken(process.env.JWT_ACCESS_SECRET, '30m'),
@@ -96,7 +100,7 @@ export class AuthService {
       });
 
       if (!user) throw new UnauthorizedException('User not found');
-      
+
       return this.generateTokenPair(user);
     } catch (error) {
       const message =
@@ -161,5 +165,54 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async addToJwtBlackList(
+    token: string,
+    tokenType: 'access' | 'refresh',
+  ): Promise<void> {
+    try {
+      const secret =
+        tokenType === 'access'
+          ? process.env.JWT_ACCESS_SECRET
+          : process.env.JWT_REFRESH_SECRET;
+      const payload = jwt.verify(token, secret) as JwtPayload;
+      const expiryDate = new Date(payload.exp * 1000);
+      await this.prisma.jwtBlackList.create({
+        data: {
+          tokenId: payload.jti,
+          expiryDate: expiryDate,
+        },
+      });
+    } catch (e) {
+      console.error('Failed to add token to JwtBlackList', e);
+    }
+  }
+
+  async isTokenInBlackList(token: object): Promise<boolean> {
+    try {
+      let parsedToken;
+      if (typeof token === 'string') {
+        parsedToken = jwt.decode(token) as jwt.JwtPayload | null;
+      } else {
+        parsedToken = token;
+      }
+
+      if (!parsedToken) {
+        console.error('Failed to decode token in JwtBlackList');
+        return false;
+      }
+  
+      const jti = parsedToken.jti;
+  
+      const blackListedToken = await this.prisma.jwtBlackList.findUnique({
+        where: { tokenId: jti },
+      });
+  
+      return !!blackListedToken;
+    } catch (e) {
+      console.error('Failed to check token in JwtBlackList', e);
+      return false;
+    }
   }
 }
