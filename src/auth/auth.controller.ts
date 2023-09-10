@@ -16,6 +16,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import * as cookieParser from 'cookie-parser';
+import { RefreshMiddleware } from './middlewares/refresh.middleware';
 
 @Controller('api/auth')
 export class AuthController {
@@ -61,6 +62,7 @@ export class AuthController {
     return `access token="${tokens.access_token}"`;
   }
 
+  @UseGuards(RefreshMiddleware)
   @Post('refresh')
   async refresh(
     @Req() req: ExpressRequest & { cookies: { [key: string]: string } },
@@ -72,7 +74,13 @@ export class AuthController {
       throw new UnauthorizedException('Refresh token not found');
     }
 
-    await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    const isTokenInBlackList = await this.authService.isTokenInBlackList(
+      refreshToken,
+    );
+    
+    if(!isTokenInBlackList){
+      await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    }
 
     const { access_token: newAccessToken, refresh_token: newRefreshToken } =
       await this.authService.refreshTokens(refreshToken);
@@ -150,22 +158,15 @@ export class AuthController {
       throw new UnauthorizedException('Refresh token not found');
     }
 
-    const accessToken = req.headers['authorization']?.split(' ')[1];
-    if (accessToken) {
-      await this.authService.addToJwtBlackList(accessToken, 'access');
-    }
-    // console.log( await this.authService.isTokenInBlackList(accessToken));
+    const isTokenInBlackList = await this.authService.isTokenInBlackList(
+      refreshToken,
+    );
 
-    await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    if(!isTokenInBlackList){
+      await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    }
     
     res.cookie('refresh token', '', { httpOnly: true, maxAge: 0 });
-
-    const invalidTokenPayload = { sub: -1, email: 'invalid@example.com' };
-    const invalidToken = await this.jwtService.signAsync(invalidTokenPayload, {
-      expiresIn: '1s',
-    });
-
-    res.header('authorization', `Bearer ${invalidToken}`);
 
     return { message: 'Вы успешно вышли из системы' };
   }

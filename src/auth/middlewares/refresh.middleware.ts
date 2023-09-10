@@ -1,4 +1,8 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../auth.service';
 import { JwtService } from '@nestjs/jwt';
@@ -21,21 +25,31 @@ export class RefreshMiddleware implements NestMiddleware {
       }
     } catch (err) {
       const refreshToken = req.cookies['refresh token'];
+      const isTokenInBlackList = await this.authService.isTokenInBlackList(
+        refreshToken,
+      );
 
       if (refreshToken) {
-        try {
-          const { access_token: newAccessToken, refresh_token: newRefreshToken } = await this.authService.refreshTokens(
-            refreshToken,
-          );
+        if (!isTokenInBlackList) {
+          try {
+            const {
+              access_token: newAccessToken,
+              refresh_token: newRefreshToken,
+            } = await this.authService.refreshTokens(refreshToken);
 
-          res.cookie('refresh token', newRefreshToken, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-          });
-          req.headers.authorization = `Bearer ${newAccessToken}`;
-        } catch (refreshErr) {
-          next();
-          return;
+            await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+
+            res.cookie('refresh token', newRefreshToken, {
+              httpOnly: true,
+              maxAge: 24 * 60 * 60 * 1000,
+            });
+            req.headers.authorization = `Bearer ${newAccessToken}`;
+          } catch (refreshErr) {
+            next();
+            return;
+          }
+        } else {
+          throw new UnauthorizedException('Refresh token is in the black list');
         }
       } else {
         next();

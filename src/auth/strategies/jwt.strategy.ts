@@ -14,17 +14,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // Проверка токена в черном списке:
-    const isTokenInBlackList = await this.authService.isTokenInBlackList(
-      payload,
-    );
-
-
-    if (isTokenInBlackList) {
-      throw new UnauthorizedException('Token is in the black list');
-    }
-
-    // Если токен недействителен, вызовется исключение UnauthorizedException, иначе он пропускается и продолжает выполнения.
     return { userId: payload.sub, email: payload.email };
   }
 }
