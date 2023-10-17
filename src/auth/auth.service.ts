@@ -9,11 +9,16 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import * as cron from 'node-cron';
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaClient, private jwtService: JwtService) {
     this.prisma = new PrismaClient();
+    //'*/10 * * * * *'
+    cron.schedule('0 0 * * *', () => {
+      this.deleteExpiredTokens();
+    });
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<Users> {
@@ -67,6 +72,14 @@ export class AuthService {
     }); // уменьшить
 
     return user;
+  }
+
+  async deleteUser(id: number) {
+    await this.prisma.users.delete({
+      where: {
+        id: id,
+      },
+    });
   }
 
   async generateTokenPair(
@@ -167,20 +180,14 @@ export class AuthService {
     return user;
   }
 
-  async addToJwtBlackList(
-    token: string,
-    tokenType: 'access' | 'refresh',
-  ): Promise<void> {
+  async addToJwtRefreshTokens(token: string): Promise<void> {
     try {
-      const secret =
-        tokenType === 'access'
-          ? process.env.JWT_ACCESS_SECRET
-          : process.env.JWT_REFRESH_SECRET;
+      const secret = process.env.JWT_REFRESH_SECRET;
       const payload = jwt.verify(token, secret) as JwtPayload;
       const expiryDate = new Date(payload.exp * 1000);
-      await this.prisma.jwtBlackList.create({
+      await this.prisma.jwtRefreshTokens.create({
         data: {
-          tokenId: payload.jti,
+          token: token,
           expiryDate: expiryDate,
         },
       });
@@ -189,30 +196,45 @@ export class AuthService {
     }
   }
 
-  async isTokenInBlackList(token: object): Promise<boolean> {
-    try {
-      let parsedToken;
-      if (typeof token === 'string') {
-        parsedToken = jwt.decode(token) as jwt.JwtPayload | null;
-      } else {
-        parsedToken = token;
-      }
+  async deleteFromJwtRefreshTokens(token: string) {
+    await this.prisma.jwtRefreshTokens.delete({
+      where: {
+        token: token,
+      },
+    });
+  }
 
-      if (!parsedToken) {
+  async isTokenInJwtRefreshTokens(token: string): Promise<boolean> {
+    try {
+      if (!token) {
         console.error('Failed to decode token in JwtBlackList');
         return false;
       }
-  
-      const jti = parsedToken.jti;
-  
-      const blackListedToken = await this.prisma.jwtBlackList.findUnique({
-        where: { tokenId: jti },
+
+      const findToken = await this.prisma.jwtRefreshTokens.findUnique({
+        where: { token: token },
       });
-  
-      return !!blackListedToken;
+
+      return !!findToken;
     } catch (e) {
       console.error('Failed to check token in JwtBlackList', e);
       return false;
+    }
+  }
+
+  async deleteExpiredTokens() {
+    const currentDateTime = new Date();
+
+    try {
+      await this.prisma.jwtRefreshTokens.deleteMany({
+        where: {
+          expiryDate: {
+            lte: currentDateTime,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error deleting expired tokens:', error);
     }
   }
 }

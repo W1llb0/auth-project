@@ -25,7 +25,7 @@ export class RefreshMiddleware implements NestMiddleware {
       }
     } catch (err) {
       const refreshToken = req.cookies['refresh token'];
-      const isTokenInBlackList = await this.authService.isTokenInBlackList(
+      const isTokenInBlackList = await this.authService.isTokenInJwtRefreshTokens(
         refreshToken,
       );
 
@@ -37,7 +37,7 @@ export class RefreshMiddleware implements NestMiddleware {
               refresh_token: newRefreshToken,
             } = await this.authService.refreshTokens(refreshToken);
 
-            await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+            await this.authService.addToJwtRefreshTokens(refreshToken);
 
             res.cookie('refresh token', newRefreshToken, {
               httpOnly: true,

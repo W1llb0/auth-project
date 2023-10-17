@@ -15,7 +15,6 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import * as cookieParser from 'cookie-parser';
 import { RefreshMiddleware } from './middlewares/refresh.middleware';
 
 @Controller('api/auth')
@@ -34,17 +33,24 @@ export class AuthController {
   ): Promise<{ newUser: any }> {
     const newUser = await this.authService.createUser(createUserDto);
     const tokens = await this.authService.generateTokenPair(newUser);
+    await this.authService.addToJwtRefreshTokens(tokens.refresh_token);
 
-    res.cookie('access_token', tokens.access_token, {
+    res.cookie('access token', tokens.access_token, {
       httpOnly: true,
       maxAge: 30 * 60 * 1000,
     }); // (30 минут)
-    res.cookie('refresh_token', tokens.refresh_token, {
+    res.cookie('refresh token', tokens.refresh_token, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     }); // (24 часа)
 
     return { newUser };
+  }
+
+  @Post('deleteUserById')
+  async deleteUser() {
+    await this.authService.deleteUser(52596);
+    return 'удален';
   }
 
   @UseGuards(LocalAuthGuard)
@@ -54,6 +60,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
     const tokens = await this.authService.generateTokenPair(req.user);
+    await this.authService.addToJwtRefreshTokens(tokens.refresh_token);
 
     res.cookie('refresh token', tokens.refresh_token, {
       httpOnly: true,
@@ -74,16 +81,18 @@ export class AuthController {
       throw new UnauthorizedException('Refresh token not found');
     }
 
-    const isTokenInBlackList = await this.authService.isTokenInBlackList(
-      refreshToken,
-    );
-    
-    if(!isTokenInBlackList){
-      await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    const isTokenInJwtRefreshTokens =
+      await this.authService.isTokenInJwtRefreshTokens(refreshToken);
+
+    if (isTokenInJwtRefreshTokens) {
+      await this.authService.deleteFromJwtRefreshTokens(refreshToken);
+    } else {
+      throw new UnauthorizedException('Refresh token not found');
     }
 
     const { access_token: newAccessToken, refresh_token: newRefreshToken } =
       await this.authService.refreshTokens(refreshToken);
+    await this.authService.addToJwtRefreshTokens(newRefreshToken);
 
     res.cookie('refresh token', newRefreshToken, {
       httpOnly: true,
@@ -104,10 +113,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
     const tokens = await this.authService.generateTokenPair(req.user);
+    await this.authService.addToJwtRefreshTokens(tokens.refresh_token);
     res.cookie('refresh token', tokens.refresh_token, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     }); // (24 часа)
+
     return `access token="${tokens.access_token}"`;
   }
 
@@ -122,10 +133,13 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
     const tokens = await this.authService.generateTokenPair(req.user);
+
+    await this.authService.addToJwtRefreshTokens(tokens.refresh_token);
     res.cookie('refresh token', tokens.refresh_token, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     }); // (24 часа)
+
     return `access token="${tokens.access_token}"`;
   }
 
@@ -140,6 +154,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
     const tokens = await this.authService.generateTokenPair(req.user);
+    await this.authService.addToJwtRefreshTokens(tokens.refresh_token);
     res.cookie('refresh token', tokens.refresh_token, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
@@ -158,14 +173,13 @@ export class AuthController {
       throw new UnauthorizedException('Refresh token not found');
     }
 
-    const isTokenInBlackList = await this.authService.isTokenInBlackList(
-      refreshToken,
-    );
+    const isTokenInJwtRefreshTokens =
+      await this.authService.isTokenInJwtRefreshTokens(refreshToken);
 
-    if(!isTokenInBlackList){
-      await this.authService.addToJwtBlackList(refreshToken, 'refresh');
+    if (isTokenInJwtRefreshTokens) {
+      await this.authService.deleteFromJwtRefreshTokens(refreshToken);
     }
-    
+
     res.cookie('refresh token', '', { httpOnly: true, maxAge: 0 });
 
     return { message: 'Вы успешно вышли из системы' };

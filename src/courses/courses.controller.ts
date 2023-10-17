@@ -12,7 +12,7 @@ export class CoursesController {
   async getCourseList(): Promise<Courses[]> {
     return this.coursesService.getCourseList();
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getCourseById(@Param('id') id: string): Promise<Courses | null> {

@@ -26,6 +26,7 @@ import { HttpModule } from '@nestjs/axios';
 import { CoursesController } from './courses/courses.controller';
 import { CoursesModule } from './courses/courses.module';
 import { RefreshMiddleware } from './auth/middlewares/refresh.middleware';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RefreshMiddleware } from './auth/middlewares/refresh.middleware';
     }),
     AuthModule,
     CoursesModule,
+    PaymentModule,
   ],
   controllers: [
     AppController,
@@ -60,6 +62,6 @@ export class AppModule implements NestModule {
     // consumer.apply(JwtCookieMiddleware).forRoutes('api/auth');
     // consumer.apply(JwtCheckMiddleware).forRoutes('api/allUsers');
     // consumer.apply(JwtRefreshMiddleware).exclude('api/auth').forRoutes('*');
-    consumer.apply(RefreshMiddleware).forRoutes('api/courses');
+    // consumer.apply(RefreshMiddleware).forRoutes('api/courses');
   }
 }
